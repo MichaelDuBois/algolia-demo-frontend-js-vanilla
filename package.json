@@ -1,0 +1,33 @@
+{
+  "name": "vanilla-instantsearch-michaeldubois",
+  "version": "1.0.0",
+  "private": true,
+  "main": "src/app.js",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "start": "vite --host 127.0.0.1",
+    "build": "vite build",
+    "preview": "vite preview --host 127.0.0.1",
+    "lint": "eslint .",
+    "lint:fix": "npm run lint -- --fix"
+  },
+  "devDependencies": {
+    "babel-eslint": "10.0.3",
+    "eslint": "5.7.0",
+    "eslint-config-algolia": "13.2.3",
+    "eslint-config-prettier": "3.6.0",
+    "eslint-plugin-import": "2.19.1",
+    "eslint-plugin-prettier": "3.1.2",
+    "prettier": "1.19.1",
+    "vite": "^6.3.1"
+  },
+  "keywords": [],
+  "description": "",
+  "dependencies": {
+    "algoliasearch": "4.14.2",
+    "algoliasearch-helper": "3.11.3",
+    "instantsearch.js": "4.47.0",
+    "@algolia/autocomplete-js": "1.17.0",
+    "@algolia/autocomplete-theme-classic": "1.17.0"
+  }
+}
