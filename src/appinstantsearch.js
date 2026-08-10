@@ -1,10 +1,11 @@
 import algoliasearch from 'algoliasearch/lite';
 import instantsearch from 'instantsearch.js';
-import { connectConfigure } from 'instantsearch.js/es/connectors';
 import {
+  configure,
   searchBox,
   hits,
   refinementList,
+  dynamicWidgets,
   pagination,
 } from 'instantsearch.js/es/widgets';
 
@@ -20,6 +21,7 @@ const globalVar = 'helloworld';
 const search = instantsearch({
   indexName: indexName,
   searchClient,
+  insights: true,
   routing: {
     stateMapping: {
       stateToRoute(uiState) {
@@ -53,22 +55,50 @@ const search = instantsearch({
 });
 
 search.addWidgets([
+  configure({
+    getRankingInfo: true,
+  }),
   searchBox({
     container: '#searchbox',
   }),
   hits({
     container: '#hits',
     templates: {
-      item(hit) {
+      item(hit, { html, sendEvent }) {
+        const featuredBadge = hit._rankingInfo?.promoted
+          ? html`<span class="hit-badge">Featured</span>`
+          : null;
+        const productUrl = `./product.html?objectID=${encodeURIComponent(hit.objectID)}`;
+
         // Define the templates
-        const template1 = `<div class="hit-template-1">
-                            <h2>${hit.name}</h2>
+        const template1 = html`<div class="hit-template-1">
+                            ${featuredBadge}
+                            <h2>
+                              <a href=${productUrl}>
+                                ${hit.name}
+                              </a>
+                            </h2>
                             <p> Apple! </p>
+                            <button
+                              type="button"
+                              onClick=${() =>
+                                sendEvent('conversion', hit, 'Product Added to Cart')}
+                            >
+                              Add to cart
+                            </button>
                           </div>`;
 
-        const template2 = `<div class="hit-template-2">
-                            <h3>${hit.name}</h3>
+        const template2 = html`<div class="hit-template-2">
+                            ${featuredBadge}
+                            <h3><a href=${productUrl}>${hit.name}</a></h3>
                             <span>${hit.price}</span>
+                            <button
+                              type="button"
+                              onClick=${() =>
+                                sendEvent('conversion', hit, 'Product Added to Cart')}
+                            >
+                              Add to cart
+                            </button>
                           </div>`;
 
         // Apply different templates based on a condition
@@ -93,12 +123,20 @@ search.addWidgets([
       });
     },
   }),
-  refinementList({
-    container: '#brand-list',
-    attribute: 'brand',
-    limit: 4,
-    showMore: true,
-    showMoreLimit: 1000,
+  dynamicWidgets({
+    container: '#dynamic-widgets',
+    // Widgets are rendered in the facet order configured in the Algolia
+    // dashboard. This known widget keeps Brand's current options.
+    widgets: [
+      (container) =>
+        refinementList({
+          container,
+          attribute: 'brand',
+          limit: 4,
+          showMore: true,
+          showMoreLimit: 1000,
+        }),
+    ],
   }),
   pagination({
     container: '#pagination',

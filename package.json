@@ -24,10 +24,11 @@
   "keywords": [],
   "description": "",
   "dependencies": {
+    "@algolia/autocomplete-js": "1.17.0",
+    "@algolia/autocomplete-theme-classic": "1.17.0",
     "algoliasearch": "4.14.2",
     "algoliasearch-helper": "3.11.3",
-    "instantsearch.js": "4.47.0",
-    "@algolia/autocomplete-js": "1.17.0",
-    "@algolia/autocomplete-theme-classic": "1.17.0"
+    "instantsearch.js": "4.108.0",
+    "search-insights": "2.17.3"
   }
 }

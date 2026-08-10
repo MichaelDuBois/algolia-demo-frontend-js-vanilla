@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <link rel="shortcut icon" href="./favicon.png" />
+    <link rel="stylesheet" href="./src/index.css" />
+    <link rel="stylesheet" href="./src/app.css" />
+    <title>iPhone 16 Pro — Demo Store</title>
+  </head>
+
+  <body>
+    <header class="header">
+      <h1 class="header-title"><a href="./instantsearch.html">Demo Store</a></h1>
+      <p class="header-subtitle">Product details</p>
+    </header>
+
+    <main class="container product-page">
+      <a class="back-link" href="./instantsearch.html">← Back to search</a>
+
+      <article class="product-detail">
+        <section class="product-gallery" aria-label="iPhone 16 Pro in desert titanium">
+          <div class="iphone" aria-hidden="true">
+            <div class="iphone__camera"></div>
+          </div>
+        </section>
+
+        <section>
+          <p class="product-eyebrow">Apple</p>
+          <h2 class="product-title">iPhone 16 Pro</h2>
+          <p class="product-price">From $999</p>
+          <p class="product-description">
+            A fictional product page for a phone that feels fast, looks refined,
+            and captures the everyday moments you do not want to miss.
+          </p>
+
+          <fieldset class="product-options">
+            <legend>Storage</legend>
+            <div class="storage-options">
+              <button type="button" aria-pressed="true">128GB</button>
+              <button type="button" aria-pressed="false">256GB</button>
+              <button type="button" aria-pressed="false">512GB</button>
+            </div>
+          </fieldset>
+
+          <button class="product-add-button" type="button">Add to cart — $999</button>
+          <p class="product-note">This is a static demo product. No purchase will be made.</p>
+        </section>
+      </article>
+    </main>
+    <script type="module" src="./src/product.js"></script>
+  </body>
+</html>
