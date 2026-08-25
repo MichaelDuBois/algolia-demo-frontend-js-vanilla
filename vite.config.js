@@ -7,6 +7,7 @@ export default defineConfig({
       input: {
         autocomplete: resolve(__dirname, 'index.html'),
         instantsearch: resolve(__dirname, 'instantsearch.html'),
+        product: resolve(__dirname, 'product.html'),
       },
     },
   },

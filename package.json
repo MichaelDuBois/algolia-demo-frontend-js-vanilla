@@ -5,7 +5,7 @@
   "main": "src/app.js",
   "scripts": {
     "dev": "vite --host 127.0.0.1",
-    "start": "vite --host 127.0.0.1",
+    "start": "node server.cjs",
     "build": "vite build",
     "preview": "vite preview --host 127.0.0.1",
     "lint": "eslint .",
@@ -25,9 +25,13 @@
   "description": "",
   "dependencies": {
     "@algolia/autocomplete-js": "1.17.0",
+    "@algolia/autocomplete-plugin-query-suggestions": "^1.17.0",
+    "@algolia/autocomplete-plugin-recent-searches": "^1.17.0",
     "@algolia/autocomplete-theme-classic": "1.17.0",
     "algoliasearch": "4.14.2",
     "algoliasearch-helper": "3.11.3",
+    "dotenv": "^16.6.1",
+    "express": "^5.2.1",
     "instantsearch.js": "4.108.0",
     "search-insights": "2.17.3"
   }

@@ -1,146 +1,78 @@
 import algoliasearch from 'algoliasearch/lite';
 import instantsearch from 'instantsearch.js';
-import {
-  configure,
-  searchBox,
-  hits,
-  refinementList,
-  dynamicWidgets,
-  pagination,
-} from 'instantsearch.js/es/widgets';
+import { searchBox, hits, pagination } from 'instantsearch.js/es/widgets';
+import { getAlgoliaSearchCredentials } from './algolia-credentials';
 
-const searchClient = algoliasearch(
-  'OUR12RLLSJ',
-  'ffc904c8dab7f0b0e75ec7f2110170c1'
-);
-
-const indexName = 'products';
-
-const globalVar = 'helloworld';
-
-const search = instantsearch({
-  indexName: indexName,
-  searchClient,
-  insights: true,
-  routing: {
-    stateMapping: {
-      stateToRoute(uiState) {
-        console.log(uiState);
-        const indexUiState = uiState[indexName];
-        return {
-          q: indexUiState.query,
-          categoriessss: indexUiState.menu && indexUiState.menu.categories,
-          brandssss:
-            indexUiState.refinementList && indexUiState.refinementList.brand,
-          page: indexUiState.page,
-          tab: globalVar,
-        };
-      },
-      routeToState(routeState) {
-        return {
-          [indexName]: {
-            query: routeState.q,
-            menu: {
-              categories: routeState.categories,
-            },
-            refinementList: {
-              brand: routeState.brand,
-            },
-            page: routeState.page,
-          },
-        };
-      },
-    },
-  },
+startInstantSearch().catch((error) => {
+  console.error('Unable to start InstantSearch.', error);
 });
 
-search.addWidgets([
-  configure({
-    getRankingInfo: true,
-  }),
-  searchBox({
-    container: '#searchbox',
-  }),
-  hits({
-    container: '#hits',
-    templates: {
-      item(hit, { html, sendEvent }) {
-        const featuredBadge = hit._rankingInfo?.promoted
-          ? html`<span class="hit-badge">Featured</span>`
-          : null;
-        const productUrl = `./product.html?objectID=${encodeURIComponent(hit.objectID)}`;
+async function startInstantSearch() {
+  const { appId, apiKey } = await getAlgoliaSearchCredentials();
+  const searchClient = algoliasearch(appId, apiKey);
 
-        // Define the templates
-        const template1 = html`<div class="hit-template-1">
-                            ${featuredBadge}
-                            <h2>
-                              <a href=${productUrl}>
-                                ${hit.name}
-                              </a>
-                            </h2>
-                            <p> Apple! </p>
-                            <button
-                              type="button"
-                              onClick=${() =>
-                                sendEvent('conversion', hit, 'Product Added to Cart')}
-                            >
-                              Add to cart
-                            </button>
-                          </div>`;
+  const indexName = 'dev_programs';
 
-        const template2 = html`<div class="hit-template-2">
-                            ${featuredBadge}
-                            <h3><a href=${productUrl}>${hit.name}</a></h3>
-                            <span>${hit.price}</span>
-                            <button
-                              type="button"
-                              onClick=${() =>
-                                sendEvent('conversion', hit, 'Product Added to Cart')}
-                            >
-                              Add to cart
-                            </button>
-                          </div>`;
-
-        // Apply different templates based on a condition
-        if (hit.brand === 'Apple') {
-          return template1;
-        } else {
-          return template2;
-        }
+  const search = instantsearch({
+    indexName,
+    searchClient,
+    routing: {
+      stateMapping: {
+        stateToRoute(uiState) {
+          const indexUiState = uiState[indexName] || {};
+          return {
+            q: indexUiState.query,
+            page: indexUiState.page,
+          };
+        },
+        routeToState(routeState) {
+          return {
+            [indexName]: {
+              query: routeState.q || '',
+              page: routeState.page,
+            },
+          };
+        },
       },
     },
-    transformItems(items) {
-      // Optionally transform items if necessary
-      return items.map((item) => {
-        if (item.type === 'type1') {
-          item.customTemplate = 'template1';
-        } else if (item.type === 'type2') {
-          item.customTemplate = 'template2';
-        } else {
-          item.customTemplate = 'default';
-        }
-        return item;
-      });
-    },
-  }),
-  dynamicWidgets({
-    container: '#dynamic-widgets',
-    // Widgets are rendered in the facet order configured in the Algolia
-    // dashboard. This known widget keeps Brand's current options.
-    widgets: [
-      (container) =>
-        refinementList({
-          container,
-          attribute: 'brand',
-          limit: 4,
-          showMore: true,
-          showMoreLimit: 1000,
-        }),
-    ],
-  }),
-  pagination({
-    container: '#pagination',
-  }),
-]);
+  });
 
-search.start();
+  search.addWidgets([
+    searchBox({
+      container: '#searchbox',
+    }),
+    hits({
+      container: '#hits',
+      templates: {
+        item(hit, { html }) {
+          const title = hit.name || hit.objectID;
+          const categories = Array.isArray(hit.categories)
+            ? hit.categories.join(' › ')
+            : hit.hierarchicalCategories?.lvl1 || hit.hierarchicalCategories?.lvl0;
+          const productUrl = `./product.html?objectID=${encodeURIComponent(
+            hit.objectID
+          )}`;
+
+          return html`<article class="search-result">
+            <a class="search-result__image-link" href=${productUrl}>
+              ${hit.image && html`<img src=${hit.image} alt=${title} />`}
+            </a>
+            <div>
+              ${hit.brand && html`<p class="search-result__brand">${hit.brand}</p>`}
+              <h2><a href=${productUrl}>${title}</a></h2>
+              ${hit.price != null &&
+                html`<p class="search-result__price">$${Number(hit.price).toFixed(2)}</p>`}
+              ${categories && html`<p class="search-result__categories">${categories}</p>`}
+              ${hit.description && html`<p>${hit.description}</p>`}
+            </div>
+          </article>`;
+        },
+      },
+    }),
+    pagination({
+      container: '#pagination',
+    }),
+  ]);
+
+  search.start();
+}

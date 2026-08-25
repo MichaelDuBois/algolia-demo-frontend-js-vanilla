@@ -7,7 +7,7 @@
     <link rel="shortcut icon" href="./favicon.png" />
     <link rel="stylesheet" href="./src/index.css" />
     <link rel="stylesheet" href="./src/app.css" />
-    <title>iPhone 16 Pro — Demo Store</title>
+    <title>Product details — Demo Store</title>
   </head>
 
   <body>
@@ -20,32 +20,22 @@
       <a class="back-link" href="./instantsearch.html">← Back to search</a>
 
       <article class="product-detail">
-        <section class="product-gallery" aria-label="iPhone 16 Pro in desert titanium">
-          <div class="iphone" aria-hidden="true">
-            <div class="iphone__camera"></div>
-          </div>
+        <section class="product-gallery">
+          <img class="product-image" src="" alt="" hidden />
         </section>
 
         <section>
-          <p class="product-eyebrow">Apple</p>
-          <h2 class="product-title">iPhone 16 Pro</h2>
-          <p class="product-price">From $999</p>
-          <p class="product-description">
-            A fictional product page for a phone that feels fast, looks refined,
-            and captures the everyday moments you do not want to miss.
-          </p>
+          <p class="product-eyebrow" data-product-brand></p>
+          <h2 class="product-title" data-product-name>Loading product…</h2>
+          <p class="product-price" data-product-price></p>
+          <p class="product-categories" data-product-categories></p>
+          <p class="product-description" data-product-description></p>
+          <a class="product-source-link" data-product-source hidden target="_blank" rel="noreferrer">
+            View original listing
+          </a>
 
-          <fieldset class="product-options">
-            <legend>Storage</legend>
-            <div class="storage-options">
-              <button type="button" aria-pressed="true">128GB</button>
-              <button type="button" aria-pressed="false">256GB</button>
-              <button type="button" aria-pressed="false">512GB</button>
-            </div>
-          </fieldset>
-
-          <button class="product-add-button" type="button">Add to cart — $999</button>
-          <p class="product-note">This is a static demo product. No purchase will be made.</p>
+          <button class="product-add-button" type="button" disabled>Add to cart</button>
+          <p class="product-note">This is a demo product page. No purchase will be made.</p>
         </section>
       </article>
     </main>
