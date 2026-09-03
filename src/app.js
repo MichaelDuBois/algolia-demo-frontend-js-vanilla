@@ -42,7 +42,7 @@ async function startAutocomplete() {
         templates: {
           ...source.templates,
           header() {
-            return 'Popular Searches / Suggests:';
+            return 'Query Suggestions';
           },
         },
       };
@@ -51,7 +51,6 @@ async function startAutocomplete() {
 
   autocomplete({
     container: '#autocomplete',
-    placeholder: "Search dev_programs — try 'mba' or 'development'",
     openOnFocus: true,
     debug: true,
     plugins: [recentSearchesPlugin, querySuggestionsPlugin],
@@ -68,7 +67,9 @@ async function startAutocomplete() {
                   params: { hitsPerPage: 0 },
                 },
               ]);
-              return response.results[0].userData?.[0]?.quickAccess || [];
+              return (response.results[0].userData || [])
+                .flatMap(({ quickAccess }) => quickAccess || [])
+                .sort((firstItem, secondItem) => firstItem.position - secondItem.position);
             },
             onSelect({ item }) {
               window.location.href = item.url;
@@ -100,14 +101,14 @@ async function startAutocomplete() {
                 {
                   indexName: 'dev_programs',
                   query,
-                  params: { hitsPerPage: 5 },
+                  params: { hitsPerPage: 5, facetFilters: ['contentType:program'] },
                 },
               ],
             });
           },
           templates: {
             header() {
-              return 'Programs';
+              return 'Search Results';
             },
             item({ item, html }) {
               return html`<div class="autocomplete-product">
