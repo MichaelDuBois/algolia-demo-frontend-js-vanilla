@@ -17,10 +17,6 @@ async function startInstantSearch() {
   const searchClient = algoliasearch(appId, apiKey);
 
   const indexName = 'dev_programs';
-  const initialQuery = new URLSearchParams(window.location.search).get('q') || '';
-  // PDP redirect for the latest results, keyed by the query that triggered the SKU rule.
-  let ruleRedirect = { query: null, url: null };
-  let hasCheckedInitialQuery = false;
 
   const search = instantsearch({
     indexName,
@@ -49,6 +45,8 @@ async function startInstantSearch() {
   search.addWidgets([
     searchBox({
       container: '#searchbox',
+      // Search only on submit, so a partial SKU never triggers the redirect rule.
+      searchAsYouType: false,
     }),
     hits({
       container: '#hits',
@@ -58,7 +56,9 @@ async function startInstantSearch() {
           const categories = Array.isArray(hit.categories)
             ? hit.categories.join(' › ')
             : hit.hierarchicalCategories?.lvl1 || hit.hierarchicalCategories?.lvl0;
-          const productUrl = getProductUrl(hit.objectID);
+          const productUrl = `./product.html?objectID=${encodeURIComponent(
+            hit.objectID
+          )}`;
 
           return html`<article class="search-result">
             <a class="search-result__image-link" href=${productUrl}>
@@ -85,21 +85,11 @@ async function startInstantSearch() {
         default: () => '',
       },
       transformItems(items, { results }) {
-        if (!results) {
-          return [];
-        }
-
-        const isSkuMatch = items.some((item) => item.redirectToSkuProduct === true);
-        const skuHit = isSkuMatch ? findHitWithSku(results.hits, results.query) : null;
-        ruleRedirect = {
-          query: results.query,
-          url: skuHit ? getProductUrl(skuHit.objectID) : null,
-        };
-
-        // Redirect when the page is opened with a query (e.g. submitted from autocomplete).
-        if (!hasCheckedInitialQuery && results.query === initialQuery) {
-          hasCheckedInitialQuery = true;
-          redirectToRuleUrl(initialQuery);
+        // The SKU rule fires on an exact skus match; the SKU is the product's objectID.
+        if (results && items.some((item) => item.redirectToSkuProduct === true)) {
+          window.location.replace(
+            `./product.html?objectID=${encodeURIComponent(results.query)}`
+          );
         }
 
         return [];
@@ -107,38 +97,5 @@ async function startInstantSearch() {
     }),
   ]);
 
-  // Only redirect on submit, not as the user types, so partial SKUs never trigger a jump.
-  // Capture phase: the searchBox widget stops the submit event from bubbling.
-  document.querySelector('#searchbox').addEventListener(
-    'submit',
-    (event) => {
-      const input = event.target.querySelector('input[type="search"]');
-      redirectToRuleUrl(input ? input.value : '');
-    },
-    true
-  );
-
-  function redirectToRuleUrl(query) {
-    if (ruleRedirect.url && ruleRedirect.query === query) {
-      // replace() keeps the redirecting search URL out of history, so Back doesn't loop.
-      window.location.replace(ruleRedirect.url);
-    }
-  }
-
   search.start();
-}
-
-function getProductUrl(objectID) {
-  return `./product.html?objectID=${encodeURIComponent(objectID)}`;
-}
-
-// The rule only says "the query is some SKU"; find which hit owns that exact SKU.
-function findHitWithSku(hitsList, query) {
-  const normalizedQuery = query.trim().toLowerCase();
-
-  return hitsList.find((hit) =>
-    [].concat(hit.skus || []).some(
-      (sku) => String(sku).trim().toLowerCase() === normalizedQuery
-    )
-  );
 }
