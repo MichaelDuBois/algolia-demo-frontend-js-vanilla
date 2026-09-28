@@ -101,7 +101,7 @@ async function startAutocomplete() {
                 {
                   indexName: 'dev_programs',
                   query,
-                  params: { hitsPerPage: 5, facetFilters: ['contentType:program'] },
+                  params: { hitsPerPage: 5 },
                 },
               ],
             });
